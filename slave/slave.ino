@@ -5,6 +5,10 @@
 #define UMIDADE A0
 #define DHTPIN A1
 #define DHTTYPE DHT11
+#define LDR A2
+
+#define MAX_LIGHT 1020
+#define MIN_LIGHT 500
 
 // Instancia do DHT
 DHT dht(DHTPIN,DHTTYPE);
@@ -22,7 +26,8 @@ float luminosidade = 0;
 // Configura o DHT, os pinos dos sensores e o I2C
 void setup() {
     dht.begin();
-    pinMode(UMIDADE,INPUT);           
+    pinMode(UMIDADE,INPUT); 
+    pinMode(LDR,INPUT);          
     Serial.begin(9600);
     Wire.begin(8);                // join i2c bus with address #8
     Wire.onRequest(requestEvent); // register event
@@ -40,6 +45,9 @@ void loop() {
         umidadeAr = -1;
         temperatura = -1;
     } 
+    int ldrAnalog = analogRead(LDR);
+    luminosidade = map(ldrAnalog, MIN_LIGHT, MAX_LIGHT, 0, 100);
+    if (luminosidade < 0.0) luminosidade = 0;
 
   delay(100);
 }
@@ -72,7 +80,7 @@ void requestEvent() {
         Wire.write(str.c_str());
     } else if (state == 3) {                // Sensor de luminosidade
         state++;
-        str = "3X";
+        str = String(luminosidade) + 'X';      // 'X' = Fim de string
         Wire.write(str.c_str());
     }
 
