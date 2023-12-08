@@ -6,10 +6,13 @@
 #define DHTPIN A1
 #define DHTTYPE DHT11
 #define LDR A2
+#define BOMBA 4
 
 #define MAX_LIGHT 1020
-#define MIN_LIGHT 500
+#define MIN_LIGHT 500   
 
+#define LIMIAR 70       // Porcentagem de umidade do solo
+#define TEMPO_REGA 10000    // 
 // Instancia do DHT
 DHT dht(DHTPIN,DHTTYPE);
 
@@ -27,7 +30,9 @@ float luminosidade = 0;
 void setup() {
     dht.begin();
     pinMode(UMIDADE,INPUT); 
-    pinMode(LDR,INPUT);          
+    pinMode(LDR,INPUT);      
+    pinMode(BOMBA,OUTPUT);
+    digitalWrite(BOMBA, LOW);    
     Serial.begin(9600);
     Wire.begin(8);                // join i2c bus with address #8
     Wire.onRequest(requestEvent); // register event
@@ -49,12 +54,22 @@ void loop() {
     luminosidade = map(ldrAnalog, MIN_LIGHT, MAX_LIGHT, 0, 100);
     if (luminosidade < 0.0) luminosidade = 0;
 
+    int umidadeAnalog = analogRead(UMIDADE);
+    umidadeSolo = (100 - ((umidadeAnalog/1023.0) * 100));
+
+    if (umidadeSolo < LIMIAR) {
+        Serial.println("Regando");
+        Regar();
+        delay(30000); // 30s
+        Serial.println("Terminou de esperar");
+    }
+
   delay(100);
 }
 
 // Função executada ao receber um request pelo master
 void requestEvent() {
-    Serial.println("Request recebido");
+    //Serial.println("Request recebido");
 
     String str;
     float data;
@@ -66,9 +81,7 @@ void requestEvent() {
     
     if (state == 0) {                       // Sensor de umidade do solo
         state++;
-        int umidadeAnalog = analogRead(UMIDADE);
-        data = (100 - ((umidadeAnalog/1023.0) * 100));
-        str = String(data) + 'X';           // 'X' = Fim de string
+        str = String(umidadeSolo) + 'X';           // 'X' = Fim de string
         Wire.write(str.c_str());    
     } else if (state == 1) {                // Sensor de temperatura
         state++;
@@ -86,4 +99,14 @@ void requestEvent() {
 
     delay(100);
 
+}
+
+
+
+
+void Regar() {
+    digitalWrite(BOMBA,HIGH);
+    delay(TEMPO_REGA);
+    Serial.println("Terminou de Regar");
+    digitalWrite(BOMBA, LOW);
 }

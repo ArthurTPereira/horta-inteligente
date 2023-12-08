@@ -2,8 +2,8 @@
 #include <ThingerESP8266.h>
 
 // Conexão Wifi
-const char* ssid = "CLARO AP 207";
-const char* password = "33017490";
+const char* ssid = "Mi Phone";
+const char* password = "123456789";
 
 // Conexão Thinger.io
 const char* username = "arthur_tpereira";
