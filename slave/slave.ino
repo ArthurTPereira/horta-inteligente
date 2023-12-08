@@ -11,7 +11,7 @@
 #define MAX_LIGHT 1020
 #define MIN_LIGHT 500   
 
-#define LIMIAR 70       // Porcentagem de umidade do solo
+#define LIMIAR 35       // Porcentagem de umidade do solo
 #define TEMPO_REGA 10000    // 
 // Instancia do DHT
 DHT dht(DHTPIN,DHTTYPE);
