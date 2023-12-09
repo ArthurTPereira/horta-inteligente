@@ -32,6 +32,8 @@ void setup() {
     pinMode(UMIDADE,INPUT); 
     pinMode(LDR,INPUT);      
     pinMode(BOMBA,OUTPUT);
+    pinMode(7,OUTPUT);
+    digitalWrite(7, LOW);
     digitalWrite(BOMBA, LOW);    
     Serial.begin(9600);
     Wire.begin(8);                // join i2c bus with address #8
@@ -60,7 +62,7 @@ void loop() {
     if (umidadeSolo < LIMIAR) {
         Serial.println("Regando");
         Regar();
-        delay(30000); // 30s
+        //delay(30000); // 30s
         Serial.println("Terminou de esperar");
     }
 
@@ -106,7 +108,9 @@ void requestEvent() {
 
 void Regar() {
     digitalWrite(BOMBA,HIGH);
+    digitalWrite(7, HIGH);
     delay(TEMPO_REGA);
     Serial.println("Terminou de Regar");
     digitalWrite(BOMBA, LOW);
+    digitalWrite(7, LOW);
 }
